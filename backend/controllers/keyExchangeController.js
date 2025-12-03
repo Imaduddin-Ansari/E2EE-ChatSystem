@@ -1,7 +1,3 @@
-// =============================================================================
-// KEY EXCHANGE CONTROLLER
-// =============================================================================
-
 const User = require('../models/User');
 const { logSecurityEvent } = require('../utils/securityLogger');
 

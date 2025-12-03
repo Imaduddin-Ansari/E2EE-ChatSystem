@@ -1,17 +1,7 @@
-// =============================================================================
-// KEYSTORAGE.JS - Secure IndexedDB Storage for Private Keys
-// Private keys NEVER leave the client device
-// =============================================================================
-
 const KeyStorage = {
   dbName: 'E2EEKeyStore',
   version: 1,
   storeName: 'keys',
-
-  /**
-   * Open IndexedDB database
-   * @returns {Promise<IDBDatabase>} Database instance
-   */
   async openDB() {
     return new Promise((resolve, reject) => {
       const request = indexedDB.open(this.dbName, this.version);
@@ -46,13 +36,6 @@ const KeyStorage = {
     });
   },
 
-  /**
-   * Save user's private keys to IndexedDB
-   * @param {string} userId - User ID
-   * @param {CryptoKeyPair} ecdhKeyPair - ECDH key pair
-   * @param {CryptoKeyPair} ecdsaKeyPair - ECDSA key pair
-   * @returns {Promise<void>}
-   */
   async saveKeys(userId, ecdhKeyPair, ecdsaKeyPair) {
     try {
       const db = await this.openDB();
@@ -101,11 +84,6 @@ const KeyStorage = {
     }
   },
 
-  /**
-   * Load user's private keys from IndexedDB
-   * @param {string} userId - User ID
-   * @returns {Promise<Object|null>} { ecdhPrivate, ecdsaPrivate } or null
-   */
   async loadKeys(userId) {
     try {
       const db = await this.openDB();
@@ -168,12 +146,6 @@ const KeyStorage = {
       throw err;
     }
   },
-
-  /**
-   * Check if keys exist for a user
-   * @param {string} userId - User ID
-   * @returns {Promise<boolean>} True if keys exist
-   */
   async hasKeys(userId) {
     try {
       const db = await this.openDB();
@@ -201,11 +173,6 @@ const KeyStorage = {
     }
   },
 
-  /**
-   * Delete user's private keys (logout/account deletion)
-   * @param {string} userId - User ID
-   * @returns {Promise<void>}
-   */
   async deleteKeys(userId) {
     try {
       const db = await this.openDB();
@@ -234,11 +201,6 @@ const KeyStorage = {
       throw err;
     }
   },
-
-  /**
-   * Delete all keys (clear all data)
-   * @returns {Promise<void>}
-   */
   async clearAllKeys() {
     try {
       const db = await this.openDB();
@@ -267,11 +229,6 @@ const KeyStorage = {
       throw err;
     }
   },
-
-  /**
-   * List all stored user IDs
-   * @returns {Promise<Array<string>>} Array of user IDs
-   */
   async listUserIds() {
     try {
       const db = await this.openDB();
@@ -299,13 +256,6 @@ const KeyStorage = {
     }
   },
 
-  /**
-   * Export keys for backup (encrypted with password)
-   * WARNING: Use only for secure backup purposes
-   * @param {string} userId - User ID
-   * @param {string} password - Password to encrypt backup
-   * @returns {Promise<string>} Encrypted backup string
-   */
   async exportKeysForBackup(userId, password) {
     try {
       const db = await this.openDB();
@@ -325,7 +275,6 @@ const KeyStorage = {
         throw new Error('Keys not found');
       }
       
-      // Derive encryption key from password
       const encoder = new TextEncoder();
       const passwordKey = await window.crypto.subtle.importKey(
         'raw',
@@ -372,12 +321,6 @@ const KeyStorage = {
     }
   },
 
-  /**
-   * Import keys from encrypted backup
-   * @param {string} backupString - Encrypted backup string
-   * @param {string} password - Password to decrypt backup
-   * @returns {Promise<void>}
-   */
   async importKeysFromBackup(backupString, password) {
     try {
       const backup = JSON.parse(atob(backupString));

@@ -1,7 +1,3 @@
-// =============================================================================
-// SECURITY LOGGING UTILITY
-// =============================================================================
-
 const SecurityLog = require('../models/SecurityLog');
 
 const logSecurityEvent = async (eventType, userId, details, req) => {

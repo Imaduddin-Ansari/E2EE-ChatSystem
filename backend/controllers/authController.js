@@ -1,7 +1,3 @@
-// =============================================================================
-// AUTHENTICATION CONTROLLER
-// =============================================================================
-
 const bcrypt = require('bcryptjs');
 const User = require('../models/User');
 const { logSecurityEvent } = require('../utils/securityLogger');

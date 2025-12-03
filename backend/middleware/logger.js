@@ -1,7 +1,3 @@
-// =============================================================================
-// REQUEST LOGGER MIDDLEWARE
-// =============================================================================
-
 const requestLogger = (req, res, next) => {
   console.log('='.repeat(50));
   console.log(`${new Date().toISOString()} - ${req.method} ${req.path}`);

@@ -1,7 +1,3 @@
-// =============================================================================
-// FILE CONTROLLER
-// =============================================================================
-
 const File = require('../models/File');
 const { logSecurityEvent } = require('../utils/securityLogger');
 

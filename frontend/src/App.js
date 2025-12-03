@@ -1,18 +1,153 @@
-// =============================================================================
-// APP.JS - FIXED VERSION - Proper User Loading
-// =============================================================================
-
 import React, { useState, useEffect, useRef } from 'react';
 import CryptoUtils from './data/cryptoUtils';
 import KeyStorage from './data/keyStorage';
 import api from './data/api';
 import './App.css';
 
+const ShieldIcon = () => (
+  <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+  </svg>
+);
+
+const LockIcon = ({ size = 16 }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+    <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+  </svg>
+);
+
+const UnlockIcon = ({ size = 16 }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+    <path d="M7 11V7a5 5 0 0 1 9.9-1"/>
+  </svg>
+);
+
+const KeyIcon = ({ size = 16 }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"/>
+  </svg>
+);
+
+const SendIcon = () => (
+  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <line x1="22" y1="2" x2="11" y2="13"/>
+    <polygon points="22 2 15 22 11 13 2 9 22 2"/>
+  </svg>
+);
+
+const PaperclipIcon = () => (
+  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"/>
+  </svg>
+);
+
+const LogOutIcon = () => (
+  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+    <polyline points="16 17 21 12 16 7"/>
+    <line x1="21" y1="12" x2="9" y2="12"/>
+  </svg>
+);
+
+const ChartIcon = () => (
+  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <line x1="18" y1="20" x2="18" y2="10"/>
+    <line x1="12" y1="20" x2="12" y2="4"/>
+    <line x1="6" y1="20" x2="6" y2="14"/>
+  </svg>
+);
+
+const DownloadIcon = () => (
+  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+    <polyline points="7 10 12 15 17 10"/>
+    <line x1="12" y1="15" x2="12" y2="3"/>
+  </svg>
+);
+
+const ArrowLeftIcon = () => (
+  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <line x1="19" y1="12" x2="5" y2="12"/>
+    <polyline points="12 19 5 12 12 5"/>
+  </svg>
+);
+
+const MessageIcon = () => (
+  <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+  </svg>
+);
+
+const FileIcon = () => (
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+    <polyline points="14 2 14 8 20 8"/>
+    <line x1="16" y1="13" x2="8" y2="13"/>
+    <line x1="16" y1="17" x2="8" y2="17"/>
+  </svg>
+);
+
+const FingerprintIcon = () => (
+  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M2 12C2 6.5 6.5 2 12 2a10 10 0 0 1 8 4"/>
+    <path d="M5 19.5C5.5 18 6 15 6 12c0-.7.12-1.37.34-2"/>
+    <path d="M17.29 21.02c.12-.6.43-2.3.5-3.02"/>
+    <path d="M12 10a2 2 0 0 0-2 2c0 1.02-.1 2.51-.26 4"/>
+    <path d="M8.65 22c.21-.66.45-1.32.57-2"/>
+    <path d="M14 13.12c0 2.38 0 6.38-1 8.88"/>
+    <path d="M2 16h.01"/>
+    <path d="M21.8 16c.2-2 .131-5.354 0-6"/>
+    <path d="M9 6.8a6 6 0 0 1 9 5.2c0 .47 0 1.17-.02 2"/>
+  </svg>
+);
+
+const LoaderIcon = () => (
+  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="animate-spin">
+    <line x1="12" y1="2" x2="12" y2="6"/>
+    <line x1="12" y1="18" x2="12" y2="22"/>
+    <line x1="4.93" y1="4.93" x2="7.76" y2="7.76"/>
+    <line x1="16.24" y1="16.24" x2="19.07" y2="19.07"/>
+    <line x1="2" y1="12" x2="6" y2="12"/>
+    <line x1="18" y1="12" x2="22" y2="12"/>
+    <line x1="4.93" y1="19.07" x2="7.76" y2="16.24"/>
+    <line x1="16.24" y1="7.76" x2="19.07" y2="4.93"/>
+  </svg>
+);
+
+const CheckCircleIcon = () => (
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+    <polyline points="22 4 12 14.01 9 11.01"/>
+  </svg>
+);
+
+const AlertCircleIcon = () => (
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <circle cx="12" cy="12" r="10"/>
+    <line x1="12" y1="8" x2="12" y2="12"/>
+    <line x1="12" y1="16" x2="12.01" y2="16"/>
+  </svg>
+);
+
+const AlertTriangleIcon = () => (
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
+    <line x1="12" y1="9" x2="12" y2="13"/>
+    <line x1="12" y1="17" x2="12.01" y2="17"/>
+  </svg>
+);
+
+const InfoIcon = () => (
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <circle cx="12" cy="12" r="10"/>
+    <line x1="12" y1="16" x2="12" y2="12"/>
+    <line x1="12" y1="8" x2="12.01" y2="8"/>
+  </svg>
+);
+
 function App() {
-  // ===========================================================================
-  // STATE MANAGEMENT
-  // ===========================================================================
-  
   const [view, setView] = useState('login');
   const [user, setUser] = useState(null);
   const [users, setUsers] = useState([]);
@@ -25,16 +160,11 @@ function App() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [authForm, setAuthForm] = useState({ username: '', password: '' });
-  
-  // Cache for storing messages/files per conversation
   const [conversationCache, setConversationCache] = useState({});
-  
+
   const messageSequence = useRef({});
   const fileInputRef = useRef(null);
-
-  // ===========================================================================
-  // UTILITY FUNCTIONS
-  // ===========================================================================
+  const messagesEndRef = useRef(null);
 
   const addLog = (type, message) => {
     const log = {
@@ -46,55 +176,34 @@ function App() {
     console.log(`[${type.toUpperCase()}] ${message}`);
   };
 
-  // ===========================================================================
-  // USER MANAGEMENT - FIXED
-  // ===========================================================================
-
   const loadUsers = async () => {
     try {
-      if (!user || !user.id) {
-        console.log('❌ loadUsers called but user is null or has no id');
-        return;
-      }
-      
-      console.log('📡 Loading users for user ID:', user.id);
-      
+      if (!user || !user.id) return;
       const userList = await api.getUsers(user.id);
-      
-      console.log('✅ Received users:', userList);
-      
       setUsers(userList);
       addLog('info', `Loaded ${userList.length} users`);
     } catch (err) {
-      console.error('❌ Failed to load users:', err);
       addLog('error', `Failed to load users: ${err.message}`);
     }
   };
 
-  // ===========================================================================
-  // CRITICAL FIX: useEffect to load users when user state changes
-  // ===========================================================================
-  
   useEffect(() => {
-    console.log('🔄 User state changed:', user?.username, 'View:', view);
-    
     if (user && view === 'chat') {
-      console.log('✅ User is logged in and view is chat - loading users...');
       loadUsers();
     }
-  }, [user, view]); // This will run whenever user or view changes
+  }, [user, view]);
 
-  // ===========================================================================
-  // AUTHENTICATION
-  // ===========================================================================
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [messages]);
 
   const handleRegister = async () => {
     try {
       setLoading(true);
       setError('');
-      
+
       const { username, password } = authForm;
-      
+
       if (!username || !password) {
         setError('Username and password are required');
         return;
@@ -106,32 +215,29 @@ function App() {
       }
 
       addLog('info', 'Generating cryptographic key pairs...');
-      
+
       const ecdhKeyPair = await CryptoUtils.generateECDHKeyPair();
       const ecdsaKeyPair = await CryptoUtils.generateECDSAKeyPair();
-      
+
       const ecdhPublicKey = await CryptoUtils.exportPublicKey(ecdhKeyPair.publicKey);
       const ecdsaPublicKey = await CryptoUtils.exportPublicKey(ecdsaKeyPair.publicKey);
-      
+
       addLog('info', 'Registering user with server...');
-      
+
       const response = await api.register({
         username,
         password,
         ecdhPublicKey,
         ecdsaPublicKey
       });
-      
+
       await KeyStorage.saveKeys(response.user.id, ecdhKeyPair, ecdsaKeyPair);
-      
+
       addLog('success', `User ${username} registered successfully`);
       addLog('info', 'Private keys stored securely in IndexedDB');
-      
-      // Set user and view - useEffect will handle loading users
+
       setUser(response.user);
       setView('chat');
-      // DON'T call loadUsers() here - let useEffect handle it
-      
     } catch (err) {
       setError(err.message);
       addLog('error', `Registration failed: ${err.message}`);
@@ -144,34 +250,30 @@ function App() {
     try {
       setLoading(true);
       setError('');
-      
+
       const { username, password } = authForm;
-      
+
       if (!username || !password) {
         setError('Username and password are required');
         return;
       }
-      
+
       addLog('info', `Attempting login for user ${username}...`);
-      
+
       const response = await api.login(username, password);
-      
       const keys = await KeyStorage.loadKeys(response.user.id);
-      
+
       if (!keys) {
         setError('Private keys not found. Please register again.');
         addLog('error', 'Private keys not found in secure storage');
         return;
       }
-      
+
       addLog('success', `User ${username} logged in successfully`);
       addLog('info', 'Private keys loaded from IndexedDB');
-      
-      // Set user and view - useEffect will handle loading users
+
       setUser(response.user);
       setView('chat');
-      // DON'T call loadUsers() here - let useEffect handle it
-      
     } catch (err) {
       setError(err.message);
       addLog('error', `Login failed: ${err.message}`);
@@ -180,10 +282,8 @@ function App() {
     }
   };
 
-  const handleLogout = async () => {
+  const handleLogout = () => {
     addLog('info', 'User logged out');
-    
-    // Clear all state INCLUDING conversation cache
     setUser(null);
     setSelectedUser(null);
     setMessages([]);
@@ -191,56 +291,37 @@ function App() {
     setUsers([]);
     setSessionKeys({});
     setSecurityLogs([]);
-    setConversationCache({}); // Clear conversation cache on logout
+    setConversationCache({});
     messageSequence.current = {};
     setView('login');
     setAuthForm({ username: '', password: '' });
   };
 
-  // ===========================================================================
-  // KEY EXCHANGE PROTOCOL - FIXED FOR BIDIRECTIONAL COMMUNICATION
-  // ===========================================================================
-
   const initiateKeyExchange = async (recipient) => {
     try {
+      if (!user) return;
+
       addLog('info', `Initiating key exchange with ${recipient.username}...`);
-      console.log('🔑 Starting key exchange with:', recipient.username);
-      
-      // Load sender's private keys
+
       const senderKeys = await KeyStorage.loadKeys(user.id);
-      
-      // Use the sender's STATIC ECDH private key (not ephemeral)
-      // This way, both users can derive the same shared secret using their static keys
-      
-      console.log('📡 Getting recipient public key...');
-      
-      // Import recipient's ECDH public key
-      const recipientECDHPublic = await CryptoUtils.importECDHPublicKey(
-        recipient.ecdhPublicKey
-      );
-      
-      console.log('🔐 Deriving shared secret...');
-      
-      // Derive shared secret using sender's private key and recipient's public key
+      if (!senderKeys) {
+        addLog('error', 'Sender keys not found');
+        return;
+      }
+
+      const recipientECDHPublic = await CryptoUtils.importECDHPublicKey(recipient.ecdhPublicKey);
+
       const sharedSecret = await CryptoUtils.deriveSharedSecret(
         senderKeys.ecdhPrivate,
         recipientECDHPublic
       );
-      
-      console.log('🧂 Generating salt and deriving session key...');
-      
-      // Generate salt deterministically based on both user IDs
-      // This ensures both users derive the SAME session key
-      const userIds = [user.id, recipient._id].sort(); // Sort to ensure same order
+
+      const userIds = [user.id, recipient._id].sort();
       const saltString = userIds.join('-');
       const saltBytes = new TextEncoder().encode(saltString);
-      
-      // Derive session key using HKDF
+
       const sessionKey = await CryptoUtils.deriveAESKey(sharedSecret, saltBytes);
-      
-      console.log('✅ Session key derived successfully');
-      
-      // Store session key
+
       setSessionKeys(prev => ({
         ...prev,
         [recipient._id]: {
@@ -249,33 +330,24 @@ function App() {
           established: Date.now()
         }
       }));
-      
-      // Initialize message sequence counter
+
       messageSequence.current[recipient._id] = 0;
-      
+
       addLog('success', `Session key established with ${recipient.username}`);
       addLog('info', 'Secure channel ready for communication');
-      
-      console.log('💾 Session key stored for:', recipient.username);
-      
+
       setSelectedUser(recipient);
-      
     } catch (err) {
-      console.error('❌ Key exchange failed:', err);
       addLog('error', `Key exchange failed: ${err.message}`);
     }
   };
 
-  // ===========================================================================
-  // MESSAGE HANDLING
-  // ===========================================================================
-
   const sendMessage = async () => {
-    if (!messageInput.trim() || !selectedUser) return;
-    
+    if (!messageInput.trim() || !selectedUser || !user) return;
+
     try {
       const session = sessionKeys[selectedUser._id];
-      
+
       if (!session) {
         addLog('warning', 'No session key available. Initiating key exchange...');
         await initiateKeyExchange(selectedUser);
@@ -283,31 +355,33 @@ function App() {
       }
 
       const sequence = ++messageSequence.current[selectedUser._id];
-      
+
       const messageData = {
         content: messageInput,
         sequence,
         timestamp: Date.now(),
         nonce: CryptoUtils.generateNonce()
       };
-      
+
       addLog('info', `Encrypting message (seq: ${sequence})...`);
-      
+
       const encrypted = await CryptoUtils.encryptAESGCM(
         session.key,
         JSON.stringify(messageData)
       );
-      
+
       const senderKeys = await KeyStorage.loadKeys(user.id);
+      if (!senderKeys) return;
+
       const signData = new TextEncoder().encode(
-        JSON.stringify({ 
-          ciphertext: encrypted.ciphertext, 
-          iv: encrypted.iv, 
-          sequence 
+        JSON.stringify({
+          ciphertext: encrypted.ciphertext,
+          iv: encrypted.iv,
+          sequence
         })
       );
       const signature = await CryptoUtils.sign(senderKeys.ecdsaPrivate, signData);
-      
+
       await api.sendMessage({
         senderId: user.id,
         recipientId: selectedUser._id,
@@ -317,20 +391,18 @@ function App() {
         sequence,
         nonce: messageData.nonce
       });
-      
+
       addLog('success', `Message sent (seq: ${sequence})`);
-      
-      // Add to local messages
+
       const newMessage = {
         senderId: user.id,
         content: messageInput,
         timestamp: Date.now(),
         sequence
       };
-      
+
       setMessages(prev => [...prev, newMessage]);
-      
-      // Update cache
+
       const cacheKey = selectedUser._id;
       setConversationCache(prev => ({
         ...prev,
@@ -339,85 +411,68 @@ function App() {
           messages: [...(prev[cacheKey]?.messages || []), newMessage]
         }
       }));
-      
+
       setMessageInput('');
-      
     } catch (err) {
       addLog('error', `Failed to send message: ${err.message}`);
     }
   };
 
   const loadMessages = async () => {
-    if (!selectedUser || !sessionKeys[selectedUser._id]) {
-      console.log('⚠️ Cannot load messages - selectedUser:', selectedUser?.username, 'sessionKey exists:', !!sessionKeys[selectedUser?._id]);
-      return;
-    }
-    
+    if (!selectedUser || !sessionKeys[selectedUser._id] || !user) return;
+
     try {
-      // Check if we have cached messages for this conversation
       const cacheKey = selectedUser._id;
       if (conversationCache[cacheKey]?.messages && conversationCache[cacheKey].messages.length > 0) {
-        console.log('📦 Loading messages from cache:', conversationCache[cacheKey].messages.length);
         setMessages(conversationCache[cacheKey].messages);
         addLog('info', `Loaded ${conversationCache[cacheKey].messages.length} messages from cache`);
         return;
       }
-      
-      console.log('🔄 Fetching messages from server...');
+
       addLog('info', `Loading messages with ${selectedUser.username}...`);
-      
+
       const encryptedMessages = await api.getMessages(user.id, selectedUser._id);
-      console.log('📨 Received encrypted messages:', encryptedMessages.length);
-      
       const session = sessionKeys[selectedUser._id];
       const decryptedMessages = [];
-      
+
       for (const msg of encryptedMessages) {
         try {
-          console.log('🔓 Decrypting message from:', msg.senderId);
-          
           const decrypted = await CryptoUtils.decryptAESGCM(
             session.key,
             msg.ciphertext,
             msg.iv
           );
-          
+
           const messageData = JSON.parse(decrypted);
-          console.log('✅ Decrypted message:', messageData);
-          
           const senderId = msg.senderId;
           const expectedSeq = messageSequence.current[senderId] || 0;
-          
+
           if (messageData.sequence <= expectedSeq && senderId !== user.id) {
             addLog('error', `Replay attack detected! Message seq ${messageData.sequence} <= ${expectedSeq}`);
             continue;
           }
-          
+
           if (!CryptoUtils.validateTimestamp(messageData.timestamp)) {
             addLog('warning', `Message timestamp too old: ${new Date(messageData.timestamp).toISOString()}`);
           }
-          
+
           if (senderId !== user.id) {
             messageSequence.current[senderId] = messageData.sequence;
           }
-          
+
           decryptedMessages.push({
             senderId,
             content: messageData.content,
             timestamp: messageData.timestamp,
             sequence: messageData.sequence
           });
-          
         } catch (err) {
-          console.error('❌ Failed to decrypt message:', err);
           addLog('error', `Failed to decrypt message: ${err.message}`);
         }
       }
-      
-      console.log('✅ Total decrypted messages:', decryptedMessages.length);
+
       setMessages(decryptedMessages);
-      
-      // Cache the decrypted messages
+
       setConversationCache(prev => ({
         ...prev,
         [cacheKey]: {
@@ -425,64 +480,47 @@ function App() {
           messages: decryptedMessages
         }
       }));
-      
+
       addLog('info', `Loaded ${decryptedMessages.length} messages`);
-      
     } catch (err) {
-      console.error('❌ Load messages error:', err);
       addLog('error', `Failed to load messages: ${err.message}`);
     }
   };
 
-  // ===========================================================================
-  // FILE HANDLING
-  // ===========================================================================
-
   const handleFileSelect = async (event) => {
-    const file = event.target.files[0];
-    if (!file) return;
-    
+    const file = event.target.files?.[0];
+    if (!file || !selectedUser || !user) return;
+
     try {
-      if (!selectedUser || !sessionKeys[selectedUser._id]) {
+      if (!sessionKeys[selectedUser._id]) {
         addLog('error', 'No session established for file transfer');
         alert('Please wait for secure connection to be established');
         return;
       }
 
       addLog('info', `Encrypting file: ${file.name} (${(file.size / 1024).toFixed(2)} KB)...`);
-      console.log('📎 Encrypting file:', file.name, 'Size:', file.size, 'bytes');
-      
+
       const reader = new FileReader();
-      
+
       reader.onload = async (e) => {
         try {
           const fileData = new Uint8Array(e.target.result);
           const session = sessionKeys[selectedUser._id];
-          
-          console.log('🔐 Encrypting file with session key...');
-          
-          // Encrypt file with AES-256-GCM using the SAME session key as messages
-          const encrypted = await CryptoUtils.encryptFileAESGCM(
-            session.key,
-            fileData.buffer
-          );
-          
-          console.log('✍️ Signing encrypted file...');
-          
-          // Sign encrypted file
+
+          const encrypted = await CryptoUtils.encryptFileAESGCM(session.key, fileData.buffer);
+
           const senderKeys = await KeyStorage.loadKeys(user.id);
+          if (!senderKeys) return;
+
           const signData = new TextEncoder().encode(
-            JSON.stringify({ 
+            JSON.stringify({
               filename: file.name,
-              ciphertext: Array.from(encrypted.ciphertext).slice(0, 100), // Just sign first 100 bytes for signature
-              iv: encrypted.iv 
+              ciphertext: Array.from(encrypted.ciphertext).slice(0, 100),
+              iv: encrypted.iv
             })
           );
           const signature = await CryptoUtils.sign(senderKeys.ecdsaPrivate, signData);
-          
-          console.log('📤 Uploading encrypted file to server...');
-          
-          // Upload encrypted file
+
           await api.uploadFile({
             senderId: user.id,
             recipientId: selectedUser._id,
@@ -491,59 +529,44 @@ function App() {
             iv: encrypted.iv,
             signature
           });
-          
-          console.log('✅ File uploaded successfully');
+
           addLog('success', `File encrypted and uploaded: ${file.name}`);
-          
-          // Force reload files from server (bypass cache)
           await loadFiles(true);
-          
         } catch (err) {
-          console.error('❌ File encryption failed:', err);
           addLog('error', `File encryption failed: ${err.message}`);
           alert(`Failed to encrypt file: ${err.message}`);
         }
       };
-      
-      reader.onerror = (err) => {
-        console.error('❌ File read failed:', err);
+
+      reader.onerror = () => {
         addLog('error', 'Failed to read file');
         alert('Failed to read file');
       };
-      
+
       reader.readAsArrayBuffer(file);
-      
     } catch (err) {
-      console.error('❌ File handling error:', err);
       addLog('error', `File handling error: ${err.message}`);
       alert(`File handling error: ${err.message}`);
     }
-    
+
     event.target.value = '';
   };
 
   const loadFiles = async (forceRefresh = false) => {
-    if (!selectedUser || !sessionKeys[selectedUser._id]) return;
-    
+    if (!selectedUser || !sessionKeys[selectedUser._id] || !user) return;
+
     try {
       const cacheKey = selectedUser._id;
-      
-      // Check cache first (unless force refresh)
+
       if (!forceRefresh && conversationCache[cacheKey]?.files) {
-        console.log('📦 Loading files from cache');
         setFiles(conversationCache[cacheKey].files);
         return;
       }
-      
-      console.log('🔄 Fetching files from server...');
-      
+
       const encryptedFiles = await api.getFiles(user.id, selectedUser._id);
-      
-      console.log('📎 Received files:', encryptedFiles.length);
-      
+
       setFiles(encryptedFiles);
-      
-      // Cache the files
+
       setConversationCache(prev => ({
         ...prev,
         [cacheKey]: {
@@ -551,10 +574,9 @@ function App() {
           files: encryptedFiles
         }
       }));
-      
+
       addLog('info', `Loaded ${encryptedFiles.length} files`);
     } catch (err) {
-      console.error('❌ Failed to load files:', err);
       addLog('error', `Failed to load files: ${err.message}`);
     }
   };
@@ -566,26 +588,17 @@ function App() {
         alert('Please establish a secure connection first by clicking the user');
         return;
       }
-      
-      console.log('📥 Starting file download:', file.filename);
+
       addLog('info', `Decrypting file: ${file.filename}...`);
-      
+
       const session = sessionKeys[selectedUser._id];
-      
-      console.log('🔓 Decrypting file with session key...');
-      console.log('File ciphertext length:', file.ciphertext.length);
-      console.log('File IV length:', file.iv.length);
-      
-      // Decrypt file using the SAME session key as messages
+
       const decrypted = await CryptoUtils.decryptFileAESGCM(
         session.key,
         file.ciphertext,
         file.iv
       );
-      
-      console.log('✅ File decrypted successfully, size:', decrypted.byteLength, 'bytes');
-      
-      // Create download link
+
       const blob = new Blob([decrypted]);
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
@@ -595,193 +608,215 @@ function App() {
       a.click();
       document.body.removeChild(a);
       URL.revokeObjectURL(url);
-      
-      console.log('💾 File downloaded:', file.filename);
+
       addLog('success', `File decrypted and downloaded: ${file.filename}`);
-      
     } catch (err) {
-      console.error('❌ File decryption failed:', err);
-      console.error('Error details:', {
-        name: err.name,
-        message: err.message,
-        stack: err.stack
-      });
       addLog('error', `File decryption failed: ${err.message}`);
       alert(`Failed to decrypt file: ${err.message}\n\nMake sure both users have established a secure connection.`);
     }
   };
 
-  // ===========================================================================
-  // EFFECTS
-  // ===========================================================================
-
-  // Load messages when selected user changes or session key is established
   useEffect(() => {
     if (selectedUser && sessionKeys[selectedUser._id]) {
-      // Check if we have cached data first
       const cacheKey = selectedUser._id;
       if (conversationCache[cacheKey]?.messages) {
-        console.log('📦 Restoring cached messages');
         setMessages(conversationCache[cacheKey].messages);
       } else {
         loadMessages();
       }
-      
-      // Always load files fresh (don't rely on cache for initial load)
       loadFiles(true);
     } else if (selectedUser && !sessionKeys[selectedUser._id]) {
-      // Clear messages when switching to a user without a session key
       setMessages([]);
       setFiles([]);
     }
   }, [selectedUser, sessionKeys]);
-  
-  // Auto-scroll to bottom when new messages arrive
-  useEffect(() => {
-    const messagesContainer = document.querySelector('.messages-container');
-    if (messagesContainer) {
-      messagesContainer.scrollTop = messagesContainer.scrollHeight;
+
+  const handleUserClick = (u) => {
+    setSelectedUser(u);
+    if (!sessionKeys[u._id]) {
+      initiateKeyExchange(u);
     }
-  }, [messages]);
+  };
 
-  // ===========================================================================
-  // RENDER FUNCTIONS
-  // ===========================================================================
+  const getLogIcon = (type) => {
+    switch (type) {
+      case 'success': return <CheckCircleIcon />;
+      case 'error': return <AlertCircleIcon />;
+      case 'warning': return <AlertTriangleIcon />;
+      default: return <InfoIcon />;
+    }
+  };
 
-  const renderLogin = () => (
+  // Auth View
+  const renderAuth = () => (
     <div className="auth-container">
-      <div className="auth-card">
-        <h1>🔐 E2EE Secure Chat</h1>
-        <p className="subtitle">End-to-End Encrypted Communication</p>
-        
-        {error && (
-          <div className="error-message">
-            ⚠️ {error}
+      <div className="ambient-glow glow-1" />
+      <div className="ambient-glow glow-2" />
+
+      <div className="auth-wrapper">
+        <div className="auth-header">
+          <div className="shield-icon">
+            <ShieldIcon />
           </div>
-        )}
-        
-        <div className="form-group">
-          <input
-            type="text"
-            placeholder="Username"
-            value={authForm.username}
-            onChange={(e) => setAuthForm({ ...authForm, username: e.target.value })}
-            disabled={loading}
-          />
+          <h1 className="auth-title">Secure Chat</h1>
+          <p className="auth-subtitle">End-to-End Encrypted Communication</p>
         </div>
-        
-        <div className="form-group">
-          <input
-            type="password"
-            placeholder="Password"
-            value={authForm.password}
-            onChange={(e) => setAuthForm({ ...authForm, password: e.target.value })}
-            onKeyPress={(e) => e.key === 'Enter' && (view === 'login' ? handleLogin() : handleRegister())}
-            disabled={loading}
-          />
-        </div>
-        
-        <div className="button-group">
-          {view === 'login' ? (
-            <>
-              <button onClick={handleLogin} disabled={loading} className="btn-primary">
-                {loading ? 'Logging in...' : 'Login'}
-              </button>
-              <button onClick={() => setView('register')} disabled={loading} className="btn-secondary">
-                Register
-              </button>
-            </>
-          ) : (
-            <>
-              <button onClick={handleRegister} disabled={loading} className="btn-primary">
-                {loading ? 'Registering...' : 'Register'}
-              </button>
-              <button onClick={() => setView('login')} disabled={loading} className="btn-secondary">
-                Back to Login
-              </button>
-            </>
+
+        <div className="auth-card">
+          {error && (
+            <div className="error-banner">
+              <div className="error-icon">!</div>
+              <p>{error}</p>
+            </div>
           )}
+
+          <div className="form-fields">
+            <input
+              type="text"
+              placeholder="Username"
+              value={authForm.username}
+              onChange={(e) => setAuthForm({ ...authForm, username: e.target.value })}
+              disabled={loading}
+              className="form-input"
+            />
+            <input
+              type="password"
+              placeholder="Password"
+              value={authForm.password}
+              onChange={(e) => setAuthForm({ ...authForm, password: e.target.value })}
+              onKeyPress={(e) => e.key === 'Enter' && (view === 'login' ? handleLogin() : handleRegister())}
+              disabled={loading}
+              className="form-input"
+            />
+          </div>
+
+          <div className="button-group">
+            {view === 'login' ? (
+              <>
+                <button onClick={handleLogin} disabled={loading} className="btn-primary">
+                  {loading ? <LoaderIcon /> : <><LockIcon size={16} /> Login</>}
+                </button>
+                <button onClick={() => setView('register')} disabled={loading} className="btn-secondary">
+                  Register
+                </button>
+              </>
+            ) : (
+              <>
+                <button onClick={handleRegister} disabled={loading} className="btn-primary">
+                  {loading ? <LoaderIcon /> : <><KeyIcon size={16} /> Create Account</>}
+                </button>
+                <button onClick={() => setView('login')} disabled={loading} className="btn-secondary">
+                  Back
+                </button>
+              </>
+            )}
+          </div>
         </div>
-        
-        <div className="security-info">
-          <p>🔒 AES-256-GCM Encryption</p>
-          <p>🔑 ECDH P-384 Key Exchange</p>
-          <p>✍️ ECDSA P-384 Signatures</p>
+
+        <div className="security-badges">
+          <div className="badge">
+            <LockIcon size={24} />
+            <span>AES-256-GCM</span>
+          </div>
+          <div className="badge">
+            <KeyIcon size={24} />
+            <span>ECDH P-384</span>
+          </div>
+          <div className="badge">
+            <FingerprintIcon />
+            <span>ECDSA Signatures</span>
+          </div>
         </div>
       </div>
     </div>
   );
 
+  // Chat View
   const renderChat = () => (
-    <div className="chat-container">
+    <div className="chat-layout">
+      {/* Sidebar */}
       <div className="sidebar">
         <div className="sidebar-header">
-          <h2>👤 {user?.username || 'User'}</h2>
-          <div className="header-buttons">
-            <button onClick={() => setView('logs')} className="btn-icon" title="Security Logs">
-              📊
+          <div className="user-profile">
+            <div className="avatar">{user?.username[0].toUpperCase()}</div>
+            <div className="user-details">
+              <p className="username">{user?.username}</p>
+              <p className="status"><LockIcon size={12} /> Secure</p>
+            </div>
+          </div>
+          <div className="header-actions">
+            <button onClick={() => setView('logs')} className="icon-btn" title="Security Logs">
+              <ChartIcon />
             </button>
-            <button onClick={handleLogout} className="btn-icon" title="Logout">
-              🚪
+            <button onClick={handleLogout} className="icon-btn logout-btn" title="Logout">
+              <LogOutIcon />
             </button>
           </div>
         </div>
-        
+
         <div className="user-list">
-          <h3>Users ({users.length})</h3>
+          <p className="list-header">Users ({users.length})</p>
+
           {users.length === 0 ? (
-            <div style={{ padding: '20px', textAlign: 'center', color: '#888' }}>
-              No other users yet.<br/>
-              Register another account!
+            <div className="empty-users">
+              <MessageIcon />
+              <p>No other users yet</p>
+              <span>Register another account to start chatting</span>
             </div>
           ) : (
-            users.map((u) => (
-              <div
-                key={u._id}
-                className={`user-item ${selectedUser?._id === u._id ? 'active' : ''}`}
-                onClick={() => {
-                  setSelectedUser(u);
-                  if (!sessionKeys[u._id]) {
-                    initiateKeyExchange(u);
-                  }
-                }}
-              >
-                <div className="user-avatar">{u.username[0].toUpperCase()}</div>
-                <div className="user-info">
-                  <div className="user-name">{u.username}</div>
-                  <div className="user-status">
-                    {sessionKeys[u._id] ? '🔒 Secure' : '🔓 Not connected'}
+            <div className="users">
+              {users.map((u) => (
+                <button
+                  key={u._id}
+                  onClick={() => handleUserClick(u)}
+                  className={`user-item ${selectedUser?._id === u._id ? 'active' : ''}`}
+                >
+                  <div className="user-avatar">{u.username[0].toUpperCase()}</div>
+                  <div className="user-info">
+                    <p className="name">{u.username}</p>
+                    <p className="connection-status">
+                      {sessionKeys[u._id] ? (
+                        <><LockIcon size={12} /> Secure</>
+                      ) : (
+                        <><UnlockIcon size={12} /> Not connected</>
+                      )}
+                    </p>
                   </div>
-                </div>
-              </div>
-            ))
+                </button>
+              ))}
+            </div>
           )}
         </div>
       </div>
-      
+
+      {/* Main Chat Area */}
       <div className="chat-main">
         {selectedUser ? (
           <>
             <div className="chat-header">
-              <h2>💬 Chat with {selectedUser.username}</h2>
+              <div className="chat-user">
+                <div className="avatar">{selectedUser.username[0].toUpperCase()}</div>
+                <div>
+                  <h2>{selectedUser.username}</h2>
+                  {sessionKeys[selectedUser._id] && (
+                    <p className="encrypted-status"><LockIcon size={12} /> End-to-End Encrypted</p>
+                  )}
+                </div>
+              </div>
               {sessionKeys[selectedUser._id] && (
-                <span className="secure-badge">🔒 End-to-End Encrypted</span>
+                <div className="secure-badge">
+                  <LockIcon size={14} />
+                  Secure Channel
+                </div>
               )}
             </div>
-            
-            <div className="messages-container">
+
+            <div className="messages-area">
               {messages.length === 0 ? (
-                <div style={{ 
-                  display: 'flex', 
-                  alignItems: 'center', 
-                  justifyContent: 'center', 
-                  height: '100%',
-                  color: '#888',
-                  flexDirection: 'column',
-                  gap: '10px'
-                }}>
-                  <div>💬 No messages yet</div>
-                  <div style={{ fontSize: '14px' }}>Send a message to start the conversation</div>
+                <div className="empty-messages">
+                  <MessageIcon />
+                  <p>No messages yet</p>
+                  <span>Send a message to start the conversation</span>
                 </div>
               ) : (
                 messages.map((msg, idx) => (
@@ -789,35 +824,40 @@ function App() {
                     key={idx}
                     className={`message ${msg.senderId === user.id ? 'sent' : 'received'}`}
                   >
-                    <div className="message-content">{msg.content}</div>
-                    <div className="message-meta">
-                      {msg.senderId === user.id ? 'You' : selectedUser.username} • Seq: {msg.sequence} • {new Date(msg.timestamp).toLocaleTimeString()}
+                    <div className="message-bubble">
+                      <p>{msg.content}</p>
+                      <span className="meta">
+                        {msg.senderId === user.id ? 'You' : selectedUser.username} • Seq: {msg.sequence} • {new Date(msg.timestamp).toLocaleTimeString()}
+                      </span>
                     </div>
                   </div>
                 ))
               )}
+              <div ref={messagesEndRef} />
             </div>
-            
+
             <div className="files-section">
-              <h4>📎 Files ({files.length})</h4>
-              <div className="files-list">
-                {files.length === 0 ? (
-                  <div style={{ padding: '10px', textAlign: 'center', color: '#888', fontSize: '14px' }}>
-                    No files shared yet
-                  </div>
-                ) : (
-                  files.map((file) => (
+              <div className="files-header">
+                <FileIcon />
+                <span>Shared Files ({files.length})</span>
+              </div>
+              {files.length === 0 ? (
+                <p className="no-files">No files shared yet</p>
+              ) : (
+                <div className="files-list">
+                  {files.map((file) => (
                     <div key={file._id} className="file-item">
-                      <span>📄 {file.filename}</span>
-                      <button onClick={() => downloadFile(file)} className="btn-download">
-                        Download
+                      <FileIcon />
+                      <span>{file.filename}</span>
+                      <button onClick={() => downloadFile(file)} className="download-btn">
+                        <DownloadIcon />
                       </button>
                     </div>
-                  ))
-                )}
-              </div>
+                  ))}
+                </div>
+              )}
             </div>
-            
+
             <div className="input-area">
               <input
                 type="text"
@@ -825,6 +865,7 @@ function App() {
                 value={messageInput}
                 onChange={(e) => setMessageInput(e.target.value)}
                 onKeyPress={(e) => e.key === 'Enter' && sendMessage()}
+                className="message-input"
               />
               <input
                 type="file"
@@ -832,55 +873,68 @@ function App() {
                 onChange={handleFileSelect}
                 style={{ display: 'none' }}
               />
-              <button onClick={() => fileInputRef.current.click()} className="btn-icon">
-                📎
+              <button onClick={() => fileInputRef.current?.click()} className="attach-btn">
+                <PaperclipIcon />
               </button>
-              <button onClick={sendMessage} className="btn-send">
-                Send
+              <button onClick={sendMessage} className="send-btn">
+                <SendIcon />
               </button>
             </div>
           </>
         ) : (
-          <div className="empty-state">
-            <h2>👈 Select a user to start chatting</h2>
-            <p>All messages are end-to-end encrypted</p>
+          <div className="no-chat-selected">
+            <MessageIcon />
+            <h2>Select a conversation</h2>
+            <p>Choose a user to start chatting</p>
+            <span>All messages are end-to-end encrypted</span>
           </div>
         )}
       </div>
     </div>
   );
 
+  // Logs View
   const renderLogs = () => (
     <div className="logs-container">
       <div className="logs-header">
-        <h2>📊 Security Logs</h2>
-        <button onClick={() => setView('chat')} className="btn-secondary">
-          Back to Chat
+        <button onClick={() => setView('chat')} className="back-btn">
+          <ArrowLeftIcon />
         </button>
+        <div>
+          <h1>Security Logs</h1>
+          <p>Cryptographic operations and events</p>
+        </div>
       </div>
-      
+
       <div className="logs-list">
-        {securityLogs.map((log, idx) => (
-          <div key={idx} className={`log-item log-${log.type}`}>
-            <span className="log-time">
-              {new Date(log.timestamp).toLocaleString()}
-            </span>
-            <span className="log-type">[{log.type.toUpperCase()}]</span>
-            <span className="log-message">{log.message}</span>
+        {securityLogs.length === 0 ? (
+          <div className="empty-logs">
+            <InfoIcon />
+            <p>No logs yet</p>
+            <span>Security events will appear here</span>
           </div>
-        ))}
+        ) : (
+          securityLogs.map((log, idx) => (
+            <div key={idx} className={`log-item log-${log.type}`}>
+              <div className="log-icon">{getLogIcon(log.type)}</div>
+              <div className="log-content">
+                <div className="log-meta">
+                  <span className="log-time">{new Date(log.timestamp).toLocaleString()}</span>
+                  <span className={`log-type type-${log.type}`}>{log.type.toUpperCase()}</span>
+                </div>
+                <p className="log-message">{log.message}</p>
+              </div>
+            </div>
+          ))
+        )}
       </div>
     </div>
   );
 
-  // ===========================================================================
-  // MAIN RENDER
-  // ===========================================================================
-
   return (
     <div className="app">
-      {view === 'login' || view === 'register' ? renderLogin() : 
-       view === 'logs' ? renderLogs() : renderChat()}
+      {view === 'login' || view === 'register' ? renderAuth() :
+        view === 'logs' ? renderLogs() : renderChat()}
     </div>
   );
 }

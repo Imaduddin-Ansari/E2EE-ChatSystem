@@ -1,21 +1,7 @@
-// =============================================================================
-// API.JS - API Client for Backend Communication
-// All API calls to the Node.js backend
-// =============================================================================
-
 const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:3001/api';
 
 const api = {
-  
-  // ===========================================================================
-  // AUTHENTICATION
-  // ===========================================================================
 
-  /**
-   * Register new user
-   * @param {Object} userData - { username, password, ecdhPublicKey, ecdsaPublicKey }
-   * @returns {Promise<Object>} User data
-   */
   async register(userData) {
     try {
       const response = await fetch(`${API_BASE_URL}/auth/register`, {
@@ -39,12 +25,6 @@ const api = {
     }
   },
 
-  /**
-   * Login user
-   * @param {string} username - Username
-   * @param {string} password - Password
-   * @returns {Promise<Object>} User data
-   */
   async login(username, password) {
     try {
       const response = await fetch(`${API_BASE_URL}/auth/login`, {
@@ -68,15 +48,6 @@ const api = {
     }
   },
 
-  // ===========================================================================
-  // USER MANAGEMENT
-  // ===========================================================================
-
-  /**
-   * Get all users (excluding current user)
-   * @param {string} userId - Current user ID
-   * @returns {Promise<Array>} List of users
-   */
   async getUsers(userId) {
     try {
       const response = await fetch(`${API_BASE_URL}/users/${userId}`);
@@ -93,11 +64,6 @@ const api = {
     }
   },
 
-  /**
-   * Get user profile by ID
-   * @param {string} userId - User ID
-   * @returns {Promise<Object>} User profile
-   */
   async getUserProfile(userId) {
     try {
       const response = await fetch(`${API_BASE_URL}/users/profile/${userId}`);
@@ -113,16 +79,6 @@ const api = {
       throw err;
     }
   },
-
-  // ===========================================================================
-  // KEY EXCHANGE
-  // ===========================================================================
-
-  /**
-   * Initiate key exchange with another user
-   * @param {Object} keyExchangeData - { senderId, recipientId, ephemeralPublicKey, nonce, timestamp, signature }
-   * @returns {Promise<Object>} Recipient's public keys
-   */
   async initiateKeyExchange(keyExchangeData) {
     try {
       const response = await fetch(`${API_BASE_URL}/key-exchange/initiate`, {
@@ -146,15 +102,6 @@ const api = {
     }
   },
 
-  // ===========================================================================
-  // MESSAGES
-  // ===========================================================================
-
-  /**
-   * Send encrypted message
-   * @param {Object} messageData - { senderId, recipientId, ciphertext, iv, signature, sequence, nonce }
-   * @returns {Promise<Object>} Message ID
-   */
   async sendMessage(messageData) {
     try {
       const response = await fetch(`${API_BASE_URL}/messages`, {
@@ -178,12 +125,6 @@ const api = {
     }
   },
 
-  /**
-   * Get messages between two users
-   * @param {string} userId - Current user ID
-   * @param {string} recipientId - Other user ID
-   * @returns {Promise<Array>} List of encrypted messages
-   */
   async getMessages(userId, recipientId) {
     try {
       const response = await fetch(`${API_BASE_URL}/messages/${userId}/${recipientId}`);
@@ -200,15 +141,6 @@ const api = {
     }
   },
 
-  // ===========================================================================
-  // FILES
-  // ===========================================================================
-
-  /**
-   * Upload encrypted file
-   * @param {Object} fileData - { senderId, recipientId, filename, ciphertext, iv, signature }
-   * @returns {Promise<Object>} File ID
-   */
   async uploadFile(fileData) {
     try {
       const response = await fetch(`${API_BASE_URL}/files`, {
@@ -232,12 +164,6 @@ const api = {
     }
   },
 
-  /**
-   * Get files between two users
-   * @param {string} userId - Current user ID
-   * @param {string} recipientId - Other user ID
-   * @returns {Promise<Array>} List of encrypted files
-   */
   async getFiles(userId, recipientId) {
     try {
       const response = await fetch(`${API_BASE_URL}/files/${userId}/${recipientId}`);
@@ -254,15 +180,6 @@ const api = {
     }
   },
 
-  // ===========================================================================
-  // SECURITY LOGS
-  // ===========================================================================
-
-  /**
-   * Get security logs for a user
-   * @param {string} userId - User ID
-   * @returns {Promise<Array>} Security logs
-   */
   async getUserLogs(userId) {
     try {
       const response = await fetch(`${API_BASE_URL}/logs/${userId}`);
@@ -279,10 +196,6 @@ const api = {
     }
   },
 
-  /**
-   * Get all security logs (admin)
-   * @returns {Promise<Array>} All security logs
-   */
   async getAllLogs() {
     try {
       const response = await fetch(`${API_BASE_URL}/logs`);
@@ -299,10 +212,6 @@ const api = {
     }
   },
 
-  /**
-   * Get replay attack statistics
-   * @returns {Promise<Object>} Security statistics
-   */
   async getSecurityStats() {
     try {
       const response = await fetch(`${API_BASE_URL}/security/replay-stats`);

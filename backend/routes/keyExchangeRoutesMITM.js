@@ -1,7 +1,3 @@
-// =============================================================================
-// KEY EXCHANGE ROUTE vulnerable onee
-// =============================================================================
-
 const express = require('express');
 const router = express.Router();
 const { initiateKeyExchange } = require('../controllers/keyExchangeController');
@@ -9,9 +5,6 @@ const { initiateKeyExchange } = require('../controllers/keyExchangeController');
 router.post('/exchange-keys', async (req, res) => {
   const { publicKey, userId } = req.body;
   
-  //NO SIGNATURE VERIFICATION 
-  
-  //storing keyy
   await KeyExchange.create({
     userId,
     publicKey,

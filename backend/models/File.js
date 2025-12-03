@@ -1,7 +1,3 @@
-// =============================================================================
-// FILE MODEL
-// =============================================================================
-
 const mongoose = require('mongoose');
 
 const fileSchema = new mongoose.Schema({
@@ -37,7 +33,6 @@ const fileSchema = new mongoose.Schema({
   }
 });
 
-// Index for efficient file retrieval
 fileSchema.index({ senderId: 1, recipientId: 1, timestamp: -1 });
 
 module.exports = mongoose.model('File', fileSchema);

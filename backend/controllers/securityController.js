@@ -1,7 +1,3 @@
-// =============================================================================
-// SECURITY CONTROLLER
-// =============================================================================
-
 const SecurityLog = require('../models/SecurityLog');
 
 const getUserLogs = async (req, res) => {

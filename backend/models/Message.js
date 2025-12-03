@@ -1,7 +1,3 @@
-// =============================================================================
-// MESSAGE MODEL
-// =============================================================================
-
 const mongoose = require('mongoose');
 
 const messageSchema = new mongoose.Schema({
@@ -41,7 +37,6 @@ const messageSchema = new mongoose.Schema({
   }
 });
 
-// Compound index for efficient message retrieval
 messageSchema.index({ senderId: 1, recipientId: 1, timestamp: 1 });
 messageSchema.index({ senderId: 1, recipientId: 1, sequence: -1 });
 

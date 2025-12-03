@@ -1,7 +1,3 @@
-// =============================================================================
-// SERVER.JS - Main Application Entry Point
-// =============================================================================
-
 const dotenv=require('dotenv');
 dotenv.config();
 const express = require('express');
@@ -19,12 +15,6 @@ const securityRoutes = require('./routes/securityRoutes');
 
 const app = express();
 
-
-
-// =============================================================================
-// MIDDLEWARE
-// =============================================================================
-
 // Request logging
 app.use(requestLogger);
 
@@ -34,10 +24,6 @@ app.use(corsMiddleware);
 // Body parser
 app.use(express.json({ limit: '50mb' }));
 
-// =============================================================================
-// ROUTES
-// =============================================================================
-
 app.use('/api/auth', authRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/key-exchange', keyExchangeRoutes);
@@ -45,7 +31,6 @@ app.use('/api/messages', messageRoutes);
 app.use('/api/files', fileRoutes);
 app.use('/api/security', securityRoutes);
 
-// Legacy routes for backward compatibility
 app.get('/api/logs/:userId', (req, res, next) => {
   req.url = `/api/security/logs/${req.params.userId}`;
   app._router.handle(req, res, next);
@@ -61,16 +46,10 @@ app.get('/api/security/replay-stats', (req, res, next) => {
   app._router.handle(req, res, next);
 });
 
-// =============================================================================
-// ERROR HANDLING
-// =============================================================================
-
-// 404 handler
 app.use((req, res) => {
   res.status(404).json({ error: 'Route not found' });
 });
 
-// Global error handler
 app.use((err, req, res, next) => {
   console.error('Global error handler:', err);
   res.status(500).json({ 
@@ -78,10 +57,6 @@ app.use((err, req, res, next) => {
     message: process.env.NODE_ENV === 'development' ? err.message : undefined
   });
 });
-
-// =============================================================================
-// SERVER STARTUP
-// =============================================================================
 
 const PORT = process.env.PORT || 3001;
 
@@ -92,9 +67,9 @@ const startServer = async () => {
     
     // Start server
     app.listen(PORT, () => {
-      console.log(`✓ Server running on port ${PORT}`);
-      console.log('✓ E2EE Secure Communication System Backend Active');
-      console.log('✓ CORS enabled for http://localhost:3000');
+      console.log(`Server running on port ${PORT}`);
+      console.log('E2EE Secure Communication System Backend Active');
+      console.log('CORS enabled for http://localhost:3000');
     });
   } catch (err) {
     console.error('Failed to start server:', err);

@@ -1,7 +1,3 @@
-// =============================================================================
-// SECURITY ROUTES
-// =============================================================================
-
 const express = require('express');
 const router = express.Router();
 const { getUserLogs, getAllLogs, getReplayStats } = require('../controllers/securityController');

@@ -1,7 +1,3 @@
-// =============================================================================
-// SECURITY LOG MODEL
-// =============================================================================
-
 const mongoose = require('mongoose');
 
 const securityLogSchema = new mongoose.Schema({
@@ -37,7 +33,6 @@ const securityLogSchema = new mongoose.Schema({
   }
 });
 
-// Indexes for efficient log queries
 securityLogSchema.index({ userId: 1, timestamp: -1 });
 securityLogSchema.index({ eventType: 1, timestamp: -1 });
 securityLogSchema.index({ timestamp: -1 });
